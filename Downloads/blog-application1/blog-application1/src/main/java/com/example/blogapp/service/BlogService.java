@@ -1,32 +1,38 @@
 package com.example.blogapp.service;
 
 import com.example.blogapp.entity.Blog;
-import com.example.blogapp.entity.User;
 import com.example.blogapp.repository.BlogRepository;
-import com.example.blogapp.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class BlogService {
 
     private final BlogRepository blogRepository;
-    private final UserRepository userRepository;
 
-    // Get Blogs by User
-    public List<Blog> getUserBlogs(User user) {
-        return blogRepository.findByUser(user);
+    public BlogService() {
+
+        this.blogRepository = null;
     }
 
-    // Create a new Blog
+    @Autowired
+    public BlogService(BlogRepository blogRepository) {
+        this.blogRepository = blogRepository;
+    }
+
+    public List<Blog> getUserBlogs(Long userId) {
+
+        return blogRepository.findByUserId(userId);
+    }
+
+    // Method to create a new blog
     public Blog createBlog(Blog blog) {
         return blogRepository.save(blog);
     }
 
-    // Update Blog
+    // Method to update an existing blog
     public Blog updateBlog(Long blogId, Blog updatedBlog) {
         Blog existingBlog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
         existingBlog.setTitle(updatedBlog.getTitle());
@@ -34,9 +40,8 @@ public class BlogService {
         return blogRepository.save(existingBlog);
     }
 
-    // Delete Blog
+    // Method to delete a blog
     public void deleteBlog(Long blogId) {
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
-        blogRepository.delete(blog);
+        blogRepository.deleteById(blogId);
     }
 }
